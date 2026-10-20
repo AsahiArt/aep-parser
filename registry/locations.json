@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "purpose": "Repository asset map. Cleanup and migration work should classify paths here before moving or deleting data.",
+  "locations": [
+    {
+      "id": "registry",
+      "path": "registry",
+      "class": "spec_registry",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_of_truth"
+    },
+    {
+      "id": "serializer_templates",
+      "path": "internal/serializer/templates",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    },
+    {
+      "id": "migration_engine",
+      "path": "internal/aepmigrate",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "migration_engine"
+    },
+    {
+      "id": "recipe_atoms",
+      "path": "examples/recipes",
+      "class": "atomic_fixtures",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    },
+    {
+      "id": "reverse_fixtures",
+      "path": "test_data/fixtures",
+      "class": "reverse_reference",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "regression_corpus"
+    },
+    {
+      "id": "fixture_generators",
+      "path": "test_data/generators",
+      "class": "reverse_reference",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "regression_source"
+    },
+    {
+      "id": "generated_test_data",
+      "path": "test_data/generated",
+      "class": "generated_evidence",
+      "tracked": false,
+      "required": false,
+      "lifecycle": "rebuildable"
+    },
+    {
+      "id": "effects_dictionary",
+      "path": "data/effects-dict",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "reference_dictionary"
+    },
+    {
+      "id": "reverse_reference_notes",
+      "path": "data/reference",
+      "class": "reverse_reference",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "research_record"
+    },
+    {
+      "id": "local_samples",
+      "path": "data/samples",
+      "class": "local_corpus",
+      "tracked": false,
+      "required": false,
+      "lifecycle": "local_only"
+    },
+    {
+      "id": "tmp_evidence",
+      "path": "tmp",
+      "class": "generated_evidence",
+      "tracked": false,
+      "required": false,
+      "lifecycle": "disposable"
+    },
+    {
+      "id": "migration_current_state",
+      "path": "registry/versioned_aep_migration_current.json",
+      "class": "spec_registry",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "durable_project_state"
+    },
+    {
+      "id": "migration_coverage_state",
+      "path": "registry/versioned_aep_migration_coverage.json",
+      "class": "spec_registry",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "durable_project_state"
+    },
+    {
+      "id": "versioned_migration_evidence",
+      "path": "registry/evidence/versioned-aep-migration",
+      "class": "generated_evidence",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "durable_evidence"
+    },
+    {
+      "id": "migration_scripts",
+      "path": "scripts/migration",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "automation"
+    },
+    {
+      "id": "migration_cli",
+      "path": "cmd/aepmigrate",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "automation"
+    },
+    {
+      "id": "recipe_cli",
+      "path": "cmd/aeprecipe",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "automation"
+    },
+    {
+      "id": "technique_cli",
+      "path": "cmd/aeptechnique",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "automation"
+    },
+    {
+      "id": "showcase",
+      "path": "showcase",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    },
+    {
+      "id": "public_knowledge",
+      "path": "docs/knowledge",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    },
+    {
+      "id": "sdk_examples",
+      "path": "examples/sdk",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    },
+    {
+      "id": "project_examples",
+      "path": "examples/projects",
+      "class": "source_contract",
+      "tracked": true,
+      "required": true,
+      "lifecycle": "source_contract"
+    }
+  ]
+}

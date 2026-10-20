@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "project": {
+    "target_version": "AE2020",
+    "name": "Minimal transform expression"
+  },
+  "comps": [
+    {
+      "name": "Main",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": 30,
+      "duration": 2,
+      "background_color": [0, 0, 0],
+      "layers": [
+        {
+          "type": "text",
+          "name": "Title",
+          "text": "Expr",
+          "transform": {
+            "position": [960, 540],
+            "opacity": 100,
+            "expressions": {
+              "position": {
+                "source": "[value[0] + time * 10, value[1], value[2]]",
+                "enabled": true
+              },
+              "anchor_point": {
+                "source": "[value[0], value[1], value[2]]",
+                "enabled": true
+              },
+              "scale": {
+                "source": "[value[0], value[1], value[2]]",
+                "enabled": true
+              },
+              "rotation": {
+                "source": "value + time * 5",
+                "enabled": true
+              },
+              "opacity": {
+                "source": "time * 50",
+                "enabled": false
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "expected_profile": {
+    "comp_count": 1,
+    "layer_count": 1,
+    "text_layer_count": 1,
+    "layers": [
+      {
+        "name": "Title",
+        "type": "text"
+      }
+    ],
+    "properties": [
+      {
+        "layer_name": "Title",
+        "match_name": "ADBE Position",
+        "expression": "[value[0] + time * 10, value[1], value[2]]",
+        "expression_enabled": true
+      },
+      {
+        "layer_name": "Title",
+        "match_name": "ADBE Anchor Point",
+        "expression": "[value[0], value[1], value[2]]",
+        "expression_enabled": true
+      },
+      {
+        "layer_name": "Title",
+        "match_name": "ADBE Scale",
+        "expression": "[value[0], value[1], value[2]]",
+        "expression_enabled": true
+      },
+      {
+        "layer_name": "Title",
+        "match_name": "ADBE Rotate Z",
+        "expression": "value + time * 5",
+        "expression_enabled": true
+      },
+      {
+        "layer_name": "Title",
+        "match_name": "ADBE Opacity",
+        "expression": "time * 50",
+        "expression_enabled": false
+      }
+    ]
+  }
+}

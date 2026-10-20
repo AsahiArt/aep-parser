@@ -1,0 +1,568 @@
+package technique
+
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
+func BuildExplanation(portrait *Portrait) (*Explanation, error) {
+	if portrait == nil {
+		return nil, fmt.Errorf("technique: nil portrait")
+	}
+	explanation := &Explanation{
+		SchemaVersion:        SchemaVersion,
+		SourcePath:           portrait.SourcePath,
+		Portrait:             *portrait,
+		Overview:             buildOverview(portrait),
+		Archetypes:           buildArchetypes(portrait),
+		RecreationReadiness:  buildRecreationReadiness(portrait),
+		RecreationSteps:      buildRecreationSteps(portrait),
+		Techniques:           buildTechniqueExplanations(portrait),
+		TopSignalLayers:      topSignalLayers(portrait.SignalLayers, 3),
+		ReproducibilityNotes: buildReproducibilityNotes(portrait),
+		UnknownNotes:         buildUnknownNotes(portrait),
+	}
+	explanation.Patterns = buildPatterns(explanation.Archetypes, portrait)
+	return explanation, nil
+}
+
+func buildOverview(portrait *Portrait) []string {
+	fp := portrait.Fingerprint
+	overview := []string{fmt.Sprintf(
+		"Project has %d comps, %d layers, %d effects, %d text animators, %d shape operators, and %d dependency edges.",
+		fp.CompCount,
+		fp.LayerCount,
+		fp.EffectCount,
+		fp.TextAnimatorCount,
+		fp.ShapeOperatorCount,
+		fp.DependencyCount,
+	)}
+	if roles := formatTopCounts(fp.LayerRoleCounts, 4); roles != "" {
+		overview = append(overview, "Dominant layer roles: "+roles+".")
+	}
+	if effects := formatTopCounts(portrait.Mechanisms.EffectMatchCounts, 4); effects != "" {
+		overview = append(overview, "Most-used effects: "+effects+".")
+	}
+	if shapes := formatTopCounts(portrait.Mechanisms.ShapeFamilyCounts, 4); shapes != "" {
+		overview = append(overview, "Most-used shape mechanisms: "+shapes+".")
+	}
+	return overview
+}
+
+func buildRecreationReadiness(portrait *Portrait) RecreationReadiness {
+	unknowns := portrait.Unknowns.Count
+	thirdParty := portrait.Mechanisms.ReproducibilityCounts["third_party"]
+	cycore := portrait.Mechanisms.ReproducibilityCounts["cycore"]
+	readiness := RecreationReadiness{
+		Status:  "analysis_ready",
+		Summary: "No parser unknowns or third-party effects were detected in the current portrait.",
+	}
+	if cycore > 0 {
+		readiness.Notes = append(readiness.Notes, fmt.Sprintf("cycore bundled effects: %d", cycore))
+	}
+	if thirdParty > 0 {
+		readiness.Status = "needs_plugins"
+		readiness.Summary = "Third-party effects must be available before exact recreation can be evaluated."
+		pluginEffects := formatTopCounts(portrait.Mechanisms.ThirdPartyEffectMatchCounts, 5)
+		if pluginEffects == "" {
+			pluginEffects = fmt.Sprintf("%d", thirdParty)
+		}
+		readiness.Blockers = append(readiness.Blockers, "third-party effects: "+pluginEffects)
+	}
+	if unknowns > 0 {
+		readiness.Status = "needs_reverse_engineering"
+		readiness.Summary = "Unknown parsed fields must be explained before exact recreation can be claimed."
+		readiness.Blockers = append([]string{fmt.Sprintf("unknown parsed items: %d", unknowns)}, readiness.Blockers...)
+	}
+	return readiness
+}
+
+func buildRecreationSteps(portrait *Portrait) []RecreationStep {
+	fp := portrait.Fingerprint
+	if fp.CompCount == 0 && fp.LayerCount == 0 && fp.EffectCount == 0 &&
+		fp.TextAnimatorCount == 0 && fp.ShapeOperatorCount == 0 &&
+		fp.DependencyCount == 0 && fp.UnknownCount == 0 {
+		return nil
+	}
+
+	steps := make([]RecreationStep, 0, 7)
+	if fp.CompCount > 0 || fp.DependencyCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "structure",
+			Title:    "Rebuild composition structure",
+			Priority: 10,
+			Summary:  fmt.Sprintf("Create %d compositions and restore the dependency graph before recreating layer internals.", fp.CompCount),
+			Inputs:   nonEmptyStrings(fmt.Sprintf("comps: %d", fp.CompCount), fmt.Sprintf("dependency edges: %d", fp.DependencyCount)),
+			Evidence: topCountEvidence("graph", portrait.Graph.RelationCounts, 5),
+		})
+	}
+	if fp.LayerCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "layers",
+			Title:    "Rebuild layer stacks",
+			Priority: 20,
+			Summary:  fmt.Sprintf("Create %d layers with their ordering, roles, timing, sources, parents, and mattes.", fp.LayerCount),
+			Inputs:   topCountEvidence("roles", fp.LayerRoleCounts, 6),
+			Evidence: signalLayerEvidence(portrait.SignalLayers, 3),
+		})
+	}
+	if fp.ShapeOperatorCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "shapes",
+			Title:    "Rebuild shape operators",
+			Priority: 30,
+			Summary:  fmt.Sprintf("Restore %d shape operators and their family-specific properties.", fp.ShapeOperatorCount),
+			Inputs:   topCountEvidence("shape families", portrait.Mechanisms.ShapeFamilyCounts, 6),
+		})
+	}
+	if fp.TextAnimatorCount > 0 || fp.TextLayerCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "text",
+			Title:    "Rebuild text animation",
+			Priority: 40,
+			Summary:  textRecreationSummary(fp.TextLayerCount, fp.TextAnimatorCount),
+			Inputs:   topCountEvidence("text animators", portrait.Mechanisms.TextAnimatorKindCounts, 6),
+		})
+	}
+	if fp.EffectCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "effects",
+			Title:    "Rebuild effect stacks",
+			Priority: 50,
+			Summary:  fmt.Sprintf("Apply %d effects after layer identity and dependencies are in place.", fp.EffectCount),
+			Inputs:   topCountEvidence("effects", portrait.Mechanisms.EffectMatchCounts, 8),
+			Risks:    effectRecreationRisks(portrait),
+		})
+	}
+	if portrait.Fingerprint.LayerRoleCounts["controller"] > 0 || portrait.Graph.RelationCounts["effect_param_layer"] > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "controllers",
+			Title:    "Reconnect controller references",
+			Priority: 60,
+			Summary:  "Reconnect controller layers and layer-reference parameters after target layers exist.",
+			Inputs: nonEmptyStrings(
+				fmt.Sprintf("controller layers: %d", portrait.Fingerprint.LayerRoleCounts["controller"]),
+				fmt.Sprintf("effect layer-reference edges: %d", portrait.Graph.RelationCounts["effect_param_layer"]),
+			),
+		})
+	}
+	if fp.UnknownCount > 0 {
+		steps = append(steps, RecreationStep{
+			ID:       "unknowns",
+			Title:    "Resolve unknown parsed fields",
+			Priority: 90,
+			Summary:  "Unknown parsed fields block any claim of exact recreation until they are explained or intentionally ignored.",
+			Risks:    []string{fmt.Sprintf("unknown parsed items: %d", fp.UnknownCount)},
+		})
+	}
+	sort.Slice(steps, func(i, j int) bool {
+		if steps[i].Priority != steps[j].Priority {
+			return steps[i].Priority < steps[j].Priority
+		}
+		return steps[i].ID < steps[j].ID
+	})
+	return steps
+}
+
+func buildArchetypes(portrait *Portrait) []ProjectArchetype {
+	var out []ProjectArchetype
+	fp := portrait.Fingerprint
+	roles := fp.LayerRoleCounts
+	graph := portrait.Graph.RelationCounts
+	repro := portrait.Mechanisms.ReproducibilityCounts
+	hints := map[string]bool{}
+	for _, hint := range portrait.TechniqueHints {
+		hints[hint.ID] = true
+	}
+
+	if fp.ShapeOperatorCount >= 10 || roles["shape"] >= 3 || hints["shape_operator_stack"] {
+		out = append(out, ProjectArchetype{
+			ID:      "shape_system",
+			Label:   "Shape system",
+			Score:   fp.ShapeOperatorCount + roles["shape"]*2,
+			Summary: "The project relies heavily on shape layers and vector operators.",
+			Signals: []string{
+				fmt.Sprintf("shape operators: %d", fp.ShapeOperatorCount),
+				fmt.Sprintf("shape layers: %d", roles["shape"]),
+			},
+		})
+	}
+	if fp.EffectCount >= 3 || hints["effect_driven_layer"] {
+		out = append(out, ProjectArchetype{
+			ID:      "effect_stack",
+			Label:   "Effect stack",
+			Score:   fp.EffectCount*3 + len(portrait.Mechanisms.EffectMatchCounts),
+			Summary: "The look is built from effect stacks and tuned effect parameters.",
+			Signals: []string{
+				fmt.Sprintf("effects: %d", fp.EffectCount),
+				"top effects: " + fallbackText(formatTopCounts(portrait.Mechanisms.EffectMatchCounts, 3), "none"),
+			},
+		})
+	}
+	if fp.TextAnimatorCount > 0 || fp.TextLayerCount > 0 || hints["kinetic_text"] {
+		out = append(out, ProjectArchetype{
+			ID:      "text_animation",
+			Label:   "Text animation",
+			Score:   fp.TextAnimatorCount*4 + fp.TextLayerCount*2,
+			Summary: "The project contains text layers or text animator mechanisms.",
+			Signals: []string{
+				fmt.Sprintf("text animators: %d", fp.TextAnimatorCount),
+				"text animator kinds: " + fallbackText(formatTopCounts(portrait.Mechanisms.TextAnimatorKindCounts, 3), "none"),
+			},
+		})
+	}
+	if graph["source"] > 0 || roles["precomp"] > 0 || hints["precomp_assembly"] {
+		out = append(out, ProjectArchetype{
+			ID:      "precomp_system",
+			Label:   "Precomp system",
+			Score:   graph["source"]*3 + roles["precomp"]*2,
+			Summary: "Composition nesting is part of the project structure.",
+			Signals: []string{
+				fmt.Sprintf("precomp layers: %d", roles["precomp"]),
+				fmt.Sprintf("source edges: %d", graph["source"]),
+			},
+		})
+	}
+	if hints["controller_rig"] || roles["controller"] > 0 || graph["effect_param_layer"] > 0 {
+		out = append(out, ProjectArchetype{
+			ID:      "controller_rig",
+			Label:   "Controller rig",
+			Score:   roles["controller"]*5 + graph["effect_param_layer"]*2,
+			Summary: "Controller layers or layer-reference parameters coordinate other layers.",
+			Signals: []string{
+				fmt.Sprintf("controller layers: %d", roles["controller"]),
+				fmt.Sprintf("effect layer-reference edges: %d", graph["effect_param_layer"]),
+			},
+		})
+	}
+	if repro["third_party"] > 0 || hints["plugin_dependent"] {
+		pluginEffects := fallbackText(formatTopCounts(portrait.Mechanisms.ThirdPartyEffectMatchCounts, 3), "unknown")
+		out = append(out, ProjectArchetype{
+			ID:      "plugin_dependent",
+			Label:   "Plugin dependent",
+			Score:   repro["third_party"] * 5,
+			Summary: "The project uses third-party effects that affect exact recreation.",
+			Signals: []string{
+				fmt.Sprintf("third-party effects: %d", repro["third_party"]),
+				"plugin effects: " + pluginEffects,
+			},
+		})
+	}
+
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Score != out[j].Score {
+			return out[i].Score > out[j].Score
+		}
+		return out[i].ID < out[j].ID
+	})
+	return out
+}
+
+func buildPatterns(archetypes []ProjectArchetype, portrait *Portrait) []ProjectPattern {
+	scores := map[string]int{}
+	for _, archetype := range archetypes {
+		scores[archetype.ID] = archetype.Score
+	}
+	has := func(id string) bool { return scores[id] > 0 }
+	var out []ProjectPattern
+	if has("shape_system") && has("effect_stack") && has("controller_rig") {
+		out = append(out, ProjectPattern{
+			ID:         "effect_controlled_shape_system",
+			Label:      "Effect-controlled shape system",
+			Score:      scores["shape_system"] + scores["effect_stack"] + scores["controller_rig"],
+			Summary:    "Shape construction, tuned effects, and controller references are combined into one procedural system.",
+			Archetypes: []string{"shape_system", "effect_stack", "controller_rig"},
+			Signals: []string{
+				"shape mechanisms: " + fallbackText(formatTopCounts(portrait.Mechanisms.ShapeFamilyCounts, 3), "none"),
+				"effects: " + fallbackText(formatTopCounts(portrait.Mechanisms.EffectMatchCounts, 3), "none"),
+			},
+		})
+	}
+	if has("precomp_system") && has("effect_stack") {
+		out = append(out, ProjectPattern{
+			ID:         "precomp_effect_pipeline",
+			Label:      "Precomp effect pipeline",
+			Score:      scores["precomp_system"] + scores["effect_stack"],
+			Summary:    "Nested compositions are combined with effect stacks to build the final look in stages.",
+			Archetypes: []string{"precomp_system", "effect_stack"},
+			Signals: []string{
+				fmt.Sprintf("source edges: %d", portrait.Graph.RelationCounts["source"]),
+				"effects: " + fallbackText(formatTopCounts(portrait.Mechanisms.EffectMatchCounts, 3), "none"),
+			},
+		})
+	}
+	if has("text_animation") {
+		out = append(out, ProjectPattern{
+			ID:         "kinetic_text_system",
+			Label:      "Kinetic text system",
+			Score:      scores["text_animation"],
+			Summary:    "Text layers and text animator properties are central enough to treat as a repeatable text-motion pattern.",
+			Archetypes: []string{"text_animation"},
+			Signals: []string{
+				"text animators: " + fallbackText(formatTopCounts(portrait.Mechanisms.TextAnimatorKindCounts, 3), "none"),
+			},
+		})
+	}
+	if has("plugin_dependent") && has("effect_stack") {
+		out = append(out, ProjectPattern{
+			ID:         "plugin_dependent_effect_stack",
+			Label:      "Plugin-dependent effect stack",
+			Score:      scores["plugin_dependent"] + scores["effect_stack"],
+			Summary:    "Third-party effects are part of the effect stack, so learning or recreating the look depends on plugin availability.",
+			Archetypes: []string{"plugin_dependent", "effect_stack"},
+			Signals: []string{
+				"plugin effects: " + fallbackText(formatTopCounts(portrait.Mechanisms.ThirdPartyEffectMatchCounts, 3), "unknown"),
+			},
+		})
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Score != out[j].Score {
+			return out[i].Score > out[j].Score
+		}
+		return out[i].ID < out[j].ID
+	})
+	return out
+}
+
+func buildTechniqueExplanations(portrait *Portrait) []TechniqueExplanation {
+	out := make([]TechniqueExplanation, 0, len(portrait.TechniqueHints))
+	for _, hint := range portrait.TechniqueHints {
+		out = append(out, explainHint(hint, portrait))
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].ID != out[j].ID {
+			return out[i].ID < out[j].ID
+		}
+		return out[i].Summary < out[j].Summary
+	})
+	return out
+}
+
+func explainHint(hint TechniqueHint, portrait *Portrait) TechniqueExplanation {
+	note := TechniqueExplanation{
+		ID:         hint.ID,
+		Title:      techniqueTitle(hint.ID),
+		Confidence: hint.Confidence,
+		Evidence:   append([]string(nil), hint.Signals...),
+	}
+	sort.Strings(note.Evidence)
+	switch hint.ID {
+	case "controller_rig":
+		note.Summary = "A controller/null or effect layer-reference rig coordinates values across other layers."
+	case "effect_driven_layer":
+		effects := formatTopCounts(portrait.Mechanisms.EffectMatchCounts, 4)
+		if effects == "" {
+			effects = "detected effects"
+		}
+		note.Summary = "Layer appearance is driven by tuned effects, keyframes, expressions, or layer-reference parameters; prominent effects: " + effects + "."
+	case "kinetic_text":
+		textKinds := formatTopCounts(portrait.Mechanisms.TextAnimatorKindCounts, 4)
+		if textKinds == "" {
+			textKinds = "text animator properties"
+		}
+		note.Summary = "Text layers use animator properties to drive typography motion; detected animator kinds: " + textKinds + "."
+	case "matte_composite":
+		note.Summary = "Track matte dependencies reveal cutout or layered compositing structure."
+	case "plugin_dependent":
+		thirdParty := portrait.Mechanisms.ReproducibilityCounts["third_party"]
+		pluginEffects := fallbackText(formatTopCounts(portrait.Mechanisms.ThirdPartyEffectMatchCounts, 4), "unknown effects")
+		note.Summary = fmt.Sprintf("Third-party effects are present; exact recreation depends on plugin availability (%d third-party effect occurrences: %s).", thirdParty, pluginEffects)
+	case "precomp_assembly":
+		note.Summary = "Nested compositions are used to assemble reusable or staged scene parts."
+	case "shape_operator_stack":
+		shapes := formatTopCounts(portrait.Mechanisms.ShapeFamilyCounts, 5)
+		if shapes == "" {
+			shapes = "multiple shape operators"
+		}
+		note.Summary = "Shape layers combine multiple shape operators; prominent shape families: " + shapes + "."
+	default:
+		note.Summary = "Detected technique signal: " + strings.ReplaceAll(hint.ID, "_", " ") + "."
+	}
+	return note
+}
+
+func techniqueTitle(id string) string {
+	switch id {
+	case "controller_rig":
+		return "Controller rig"
+	case "effect_driven_layer":
+		return "Effect-driven layer"
+	case "kinetic_text":
+		return "Kinetic text"
+	case "matte_composite":
+		return "Matte composite"
+	case "plugin_dependent":
+		return "Plugin-dependent effect"
+	case "precomp_assembly":
+		return "Precomp assembly"
+	case "shape_operator_stack":
+		return "Shape operator stack"
+	default:
+		return titleFromID(id)
+	}
+}
+
+func titleFromID(id string) string {
+	words := strings.Fields(strings.ReplaceAll(id, "_", " "))
+	for i, word := range words {
+		if word == "" {
+			continue
+		}
+		words[i] = strings.ToUpper(word[:1]) + word[1:]
+	}
+	return strings.Join(words, " ")
+}
+
+func topSignalLayers(layers []SignalLayer, max int) []SignalLayer {
+	if max <= 0 || len(layers) == 0 {
+		return nil
+	}
+	out := append([]SignalLayer(nil), layers...)
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Score != out[j].Score {
+			return out[i].Score > out[j].Score
+		}
+		if out[i].CompName != out[j].CompName {
+			return out[i].CompName < out[j].CompName
+		}
+		return out[i].LayerName < out[j].LayerName
+	})
+	if len(out) > max {
+		out = out[:max]
+	}
+	return out
+}
+
+func buildReproducibilityNotes(portrait *Portrait) []string {
+	counts := portrait.Mechanisms.ReproducibilityCounts
+	notes := make([]string, 0, 4)
+	if counts["native"] > 0 {
+		notes = append(notes, fmt.Sprintf("native effects: %d", counts["native"]))
+	}
+	if counts["cycore"] > 0 {
+		notes = append(notes, fmt.Sprintf("cycore bundled effects: %d", counts["cycore"]))
+	}
+	if counts["third_party"] > 0 {
+		notes = append(notes, fmt.Sprintf("third-party effects: %d", counts["third_party"]))
+	}
+	if counts["unknown"] > 0 {
+		notes = append(notes, fmt.Sprintf("unknown effect reproducibility: %d", counts["unknown"]))
+	}
+	if len(notes) == 0 {
+		notes = append(notes, "No effect reproducibility risks detected.")
+	}
+	return notes
+}
+
+func buildUnknownNotes(portrait *Portrait) []string {
+	if portrait.Unknowns.Count == 0 {
+		return []string{"No unknown parsed fields were reported."}
+	}
+	return []string{fmt.Sprintf("%d unknown parsed items need inspection before claiming exact recreation.", portrait.Unknowns.Count)}
+}
+
+type countRow struct {
+	name  string
+	count int
+}
+
+func formatTopCounts(counts map[string]int, max int) string {
+	rows := topCounts(counts, max)
+	parts := make([]string, 0, len(rows))
+	for _, row := range rows {
+		parts = append(parts, fmt.Sprintf("%s (%d)", row.name, row.count))
+	}
+	return strings.Join(parts, ", ")
+}
+
+func fallbackText(value, fallback string) string {
+	if value == "" {
+		return fallback
+	}
+	return value
+}
+
+func topCounts(counts map[string]int, max int) []countRow {
+	if max <= 0 || len(counts) == 0 {
+		return nil
+	}
+	rows := make([]countRow, 0, len(counts))
+	for name, count := range counts {
+		if name == "" || count <= 0 {
+			continue
+		}
+		rows = append(rows, countRow{name: name, count: count})
+	}
+	sort.Slice(rows, func(i, j int) bool {
+		if rows[i].count != rows[j].count {
+			return rows[i].count > rows[j].count
+		}
+		return rows[i].name < rows[j].name
+	})
+	if len(rows) > max {
+		rows = rows[:max]
+	}
+	return rows
+}
+
+func topCountEvidence(label string, counts map[string]int, max int) []string {
+	rows := topCounts(counts, max)
+	if len(rows) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, fmt.Sprintf("%s: %s (%d)", label, row.name, row.count))
+	}
+	return out
+}
+
+func signalLayerEvidence(layers []SignalLayer, max int) []string {
+	layers = topSignalLayers(layers, max)
+	if len(layers) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(layers))
+	for _, layer := range layers {
+		out = append(out, fmt.Sprintf("signal layer: %s/%s role=%s score=%d", layer.CompName, layer.LayerName, layer.Role, layer.Score))
+	}
+	return out
+}
+
+func effectRecreationRisks(portrait *Portrait) []string {
+	var risks []string
+	counts := portrait.Mechanisms.ReproducibilityCounts
+	if counts["third_party"] > 0 {
+		plugins := formatTopCounts(portrait.Mechanisms.ThirdPartyEffectMatchCounts, 5)
+		risks = append(risks, "third-party effects: "+fallbackText(plugins, fmt.Sprintf("%d", counts["third_party"])))
+	}
+	if counts["unknown"] > 0 {
+		risks = append(risks, fmt.Sprintf("unknown effect reproducibility: %d", counts["unknown"]))
+	}
+	if counts["cycore"] > 0 {
+		risks = append(risks, fmt.Sprintf("cycore bundled effects: %d", counts["cycore"]))
+	}
+	return risks
+}
+
+func textRecreationSummary(textLayers, textAnimators int) string {
+	switch {
+	case textLayers > 0 && textAnimators > 0:
+		return fmt.Sprintf("Restore %d text animator properties across %d text layers.", textAnimators, textLayers)
+	case textLayers > 0:
+		return fmt.Sprintf("Restore %d text layers; no text animator properties were detected.", textLayers)
+	default:
+		return fmt.Sprintf("Restore %d text animator properties.", textAnimators)
+	}
+}
+
+func nonEmptyStrings(values ...string) []string {
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		if value != "" {
+			out = append(out, value)
+		}
+	}
+	return out
+}

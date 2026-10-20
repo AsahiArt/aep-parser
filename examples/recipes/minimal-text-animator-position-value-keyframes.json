@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "project": {"target_version": "AE2020", "name": "minimal-text-animator-position-value-keyframes"},
+  "comps": [{
+    "name": "Text Animator Position Value Keyframes",
+    "width": 640,
+    "height": 360,
+    "frame_rate": 24,
+    "duration": 3,
+    "layers": [{
+      "type": "text",
+      "name": "Title",
+      "text": "HELLO",
+      "text_animators": [{
+        "property": "position",
+        "value": [0, -80, 0],
+        "range_start": 0,
+        "range_end": 100,
+        "range_offset": 0,
+        "value_keyframes": [
+          {
+            "time": 0,
+            "value": [0, -80, 0],
+            "out_ease": { "speed": 0, "influence": 0.5 }
+          },
+          {
+            "time": 2,
+            "value": [120, 20, 0],
+            "in_ease": { "speed": 0, "influence": 0.35 }
+          }
+        ]
+      }]
+    }]
+  }],
+  "expected_profile": {
+    "comp_count": 1,
+    "layer_count": 1,
+    "layers": [{"name": "Title", "type": "text"}],
+    "keyframes": [{
+      "layer_name": "Title",
+      "match_name": "ADBE Text Position 3D",
+      "keyframes": [
+        {"time": 0, "value": [0, -80, 0]},
+        {"time": 2, "value": [120, 20, 0]}
+      ]
+    }]
+  }
+}

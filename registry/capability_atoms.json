@@ -1,0 +1,6080 @@
+{
+  "schema_version": 1,
+  "purpose": "First-pass capability atom ledger. This is intentionally representative, not exhaustive.",
+  "version_policy": {
+    "minimum_supported": "AE2020",
+    "known_supported": [
+      "AE2020",
+      "AE2021",
+      "AE2022",
+      "AE2023",
+      "AE2024",
+      "AE2025"
+    ],
+    "expansion_policy": "append_new_ae_versions",
+    "notes": [
+      "Append AE2026/AE2027 as known_supported entries after fixtures, writers, and host-open policy are registered."
+    ]
+  },
+  "capability_atoms": [
+    {
+      "id": "project.version_skeleton",
+      "domain": "project",
+      "tier": "workflow",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "parse",
+        "profile",
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "code",
+          "path": "internal/aepmigrate",
+          "required": true
+        },
+        {
+          "kind": "state",
+          "path": "registry/versioned_aep_migration_coverage.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Writer targets are registered as data; future AE versions must extend the axis instead of replacing it."
+      ]
+    },
+    {
+      "id": "text.source.default",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "profile",
+        "generate",
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-text-layer.json",
+          "required": true
+        },
+        {
+          "kind": "fixture",
+          "path": "test_data/fixtures/re_text.aep",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Text layout equivalence may need render_compare when profile fields are insufficient."
+      ]
+    },
+    {
+      "id": "registry.asset_map",
+      "domain": "registry",
+      "tier": "source_contract",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "ai_generate"
+      ],
+      "dependencies": [
+        {
+          "kind": "registry",
+          "path": "registry/locations.json",
+          "required": true
+        },
+        {
+          "kind": "registry",
+          "path": "registry/evidence.json",
+          "required": true
+        },
+        {
+          "kind": "registry",
+          "path": "registry/asset_policy.json",
+          "required": true
+        },
+        {
+          "kind": "registry",
+          "path": "registry/version_boundaries.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns the machine-readable asset map and evidence pointer registry used before cleanup, atomization, and generated-report decisions."
+      ]
+    },
+    {
+      "id": "text.animator.tracking",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-tracking.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_tracking_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Endpoint host-open inference may cover AE2021-AE2024 only when AE2020 and AE2025 direct host-open evidence passes."
+      ]
+    },
+    {
+      "id": "shape.filter.trim_paths",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate",
+        "host_open",
+        "render_compare"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-trim.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/trim_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Single-feature smoke artifacts under tmp/migration_shape_trim_paths are generated evidence and not the registry source of truth."
+      ]
+    },
+    {
+      "id": "effect.param.scalar_keyframes",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "profile",
+        "generate",
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-effect-param-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effect_adbe_gaussian_blur_2.bin",
+          "required": true
+        },
+        {
+          "kind": "dictionary",
+          "path": "data/effects-dict/effects_en_US_25.1x68.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_effect_param_keyframes/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Effect matchName and parameter contracts should stay dictionary-backed instead of being inferred from filenames."
+      ]
+    },
+    {
+      "id": "effect.templates.builtin_library",
+      "domain": "effect",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/effects",
+          "required": true
+        },
+        {
+          "kind": "dictionary",
+          "path": "data/effects-dict/effects_en_US_25.1x68.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns the embedded built-in effect and effect-parameter template directory as a serializer source contract used by mutate_effect_add.go and mutate_effect_param.go; individual effect behaviors remain covered by recipe and matrix atoms."
+      ]
+    },
+    {
+      "id": "effect.dictionary.versioned_locales",
+      "domain": "effect",
+      "tier": "source_contract",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "profile",
+        "generate",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "dictionary_dir",
+          "path": "data/effects-dict",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns versioned and localized effect dictionaries as source contracts; generated effect behavior still needs recipe, fixture, or host-open evidence."
+      ]
+    },
+    {
+      "id": "project.templates.version_skeletons",
+      "domain": "project",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/project",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns embedded project skeleton templates, including version-specific new-project seeds; detailed version behavior remains covered by project and migration matrix atoms."
+      ]
+    },
+    {
+      "id": "layer.templates.layer_kinds",
+      "domain": "layer",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/layers",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns embedded layer-kind body templates as serializer source contracts; per-layer behavior remains covered by layer recipe and matrix atoms."
+      ]
+    },
+    {
+      "id": "layer.templates.option_leaves",
+      "domain": "layer",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/options",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns embedded option-leaf templates for camera, light, mask, and material serialization; feature-level behavior remains covered by layer, mask, and material atoms."
+      ]
+    },
+    {
+      "id": "shape.templates.vector_library",
+      "domain": "shape",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/shapes",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns embedded vector shape body and leaf templates as serializer source contracts; individual shape primitives and filters remain covered by recipe and matrix atoms."
+      ]
+    },
+    {
+      "id": "text.templates.animator_library",
+      "domain": "text",
+      "tier": "template_library",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "template_dir",
+          "path": "internal/serializer/templates/text",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns embedded text animator and selector templates as serializer source contracts; individual text animator behavior remains covered by recipe and matrix atoms."
+      ]
+    },
+    {
+      "id": "fixture_generators.verify_shipgates",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "host_open",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/verify_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns AE ship-gate verification JSX sources; generated outputs remain under test_data/generated unless explicitly promoted to stable fixtures."
+      ]
+    },
+    {
+      "id": "fixture_generators.reverse_engineering_sources",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "profile"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/re_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns reverse-engineering fixture authoring scripts; stable fixture outputs are owned separately by fixture or capability atoms."
+      ]
+    },
+    {
+      "id": "fixture_generators.probe_scripts",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "profile"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/probe_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns exploratory host probing scripts that document AE behavior before promotion into stable fixtures or serializer rules."
+      ]
+    },
+    {
+      "id": "fixture_generators.build_sources",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/build_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns fixture build scripts listed by scripts/fixtures/fixtures_manifest.json or referenced by tests."
+      ]
+    },
+    {
+      "id": "fixture_generators.template_extraction",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/gen_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns JSX sources used to extract or regenerate serializer templates; committed template bytes are owned by serializer template-library atoms."
+      ]
+    },
+    {
+      "id": "fixture_generators.fdta_probes",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "profile"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/fdta_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns FDTA probe JSX sources for versioned fixture generation."
+      ]
+    },
+    {
+      "id": "fixture_generators.ship_gate_helpers",
+      "domain": "fixture",
+      "tier": "generator_family",
+      "status": "verified",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "glob",
+          "path": "test_data/generators/ship_*.jsx",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns legacy ship-gate helper JSX sources retained for host validation workflows."
+      ]
+    },
+    {
+      "id": "reference.reverse_engineering_corpus",
+      "domain": "reference",
+      "tier": "source_corpus",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "parse",
+        "profile",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "reference",
+          "path": "data/reference/README.md",
+          "required": true
+        },
+        {
+          "kind": "reference_dir",
+          "path": "data/reference/booyah-glitch",
+          "required": true
+        },
+        {
+          "kind": "reference_dir",
+          "path": "data/reference/pseudo-effect",
+          "required": true
+        },
+        {
+          "kind": "reference_dir",
+          "path": "data/reference/shape",
+          "required": true
+        },
+        {
+          "kind": "reference_dir",
+          "path": "data/reference/text-animator",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns compact reverse-engineering reference artifacts; large local project corpora remain excluded under data/samples."
+      ]
+    },
+    {
+      "id": "layer.track_matte.explicit_source",
+      "domain": "layer",
+      "tier": "boundary",
+      "status": "boundary",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "profile",
+        "generate",
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-explicit-matte.json",
+          "required": true
+        },
+        {
+          "kind": "ledger",
+          "path": "internal/aepmigrate/version_capability_ledger.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_explicit_matte_ae2025/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Explicit matte source is preserved for AE2025 targets and blocked for older writer targets by source contract."
+      ]
+    },
+    {
+      "id": "migration.version_matrix",
+      "domain": "migration",
+      "tier": "workflow",
+      "status": "active",
+      "platform": {
+        "host_required": true,
+        "os": [
+          "windows",
+          "macos"
+        ]
+      },
+      "workflows": [
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "path": "cmd/aepmigrate/main.go",
+          "required": true
+        },
+        {
+          "kind": "test",
+          "path": "cmd/aepmigrate/main_test.go",
+          "required": true
+        },
+        {
+          "kind": "state",
+          "path": "registry/versioned_aep_migration_coverage.json",
+          "required": true
+        },
+        {
+          "kind": "script_dir",
+          "path": "scripts/migration",
+          "required": true
+        },
+        {
+          "kind": "script",
+          "path": "scripts/migration/verify_matrix.ps1",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "PowerShell wrapper remains for host orchestration; new planning/audit tooling should prefer Go where practical."
+      ]
+    },
+    {
+      "id": "learning.technique_portrait",
+      "domain": "learning",
+      "tier": "workflow",
+      "status": "planned",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "parse",
+        "profile",
+        "learn"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "path": "cmd/aeptechnique/main.go",
+          "required": true
+        },
+        {
+          "kind": "test",
+          "path": "cmd/aeptechnique/main_test.go",
+          "required": true
+        },
+        {
+          "kind": "fixtures",
+          "path": "test_data/fixtures",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Learning output must distinguish reusable source contracts from local corpus observations."
+      ]
+    },
+    {
+      "id": "ai.workflow_generation",
+      "domain": "ai",
+      "tier": "workflow",
+      "status": "planned",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "ai_generate",
+        "generate"
+      ],
+      "dependencies": [
+        {
+          "kind": "registry",
+          "path": "registry/workflows.json",
+          "required": true
+        },
+        {
+          "kind": "registry",
+          "path": "registry/capability_atoms.json",
+          "required": true
+        },
+        {
+          "kind": "command",
+          "path": "cmd/aeprecipe/main.go",
+          "required": true
+        },
+        {
+          "kind": "test",
+          "path": "cmd/aeprecipe/main_test.go",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "AI generation should consume registered atoms and workflows, not scrape tmp or flightdeck markdown directly."
+      ]
+    },
+    {
+      "id": "shape.fill.blend_mode",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-fill-blend-mode.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/fill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.fill.composite_order",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-fill-composite-order.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/fill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.fill.rule",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-fill-rule.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/fill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_fill.base",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-fill.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradfill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_fill.alpha_stops",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-fill-alpha-stops.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradfill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_fill.highlight",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-fill-highlight.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradfill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_stroke.base",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-stroke.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradstroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_stroke.alpha_stops",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-stroke-alpha-stops.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradstroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_stroke.highlight",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-stroke-highlight.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradstroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.gradient_stroke.style",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-gradient-stroke-style.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/gradstroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.merge_paths",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-merge-paths.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/merge_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.offset_paths",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-offset-paths.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/offset_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.primitive.polystar",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-polystar.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/star_body.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/starpolygon_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.pucker_bloat",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-pucker-bloat.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/puckerbloat_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.primitive.rect_fill_default_transform",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-rect-fill-default-transform.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/rect_body.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/fill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.primitive.ellipse",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate",
+        "host_open"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-ellipse-fill.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/ellipse_body.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/fill_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_ellipse_fill_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Covers static ellipse size and position with fill materialization across the AE2020-AE2025 writer matrix and endpoint host-open evidence."
+      ]
+    },
+    {
+      "id": "shape.filter.repeater",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-repeater.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/repeater_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.round_corners",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-round-corners.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/roundcorners_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.stroke.composite_order",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-stroke-composite-order.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/stroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.stroke.dashes",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-stroke-dashes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/stroke_dashed_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.stroke.style",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-stroke-style.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/stroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.stroke.taper",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-stroke-taper.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/stroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.stroke.wave",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-stroke-wave.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/stroke_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.twist",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-twist.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/twist_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.wiggle_paths",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-wiggle-paths.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/wiggle_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.wiggle_transform",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-wiggle-transform.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/wiggletransform_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "shape.filter.zigzag",
+      "domain": "shape",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-shape-zigzag.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/shapes/zigzag_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_shape_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing shape all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.source.static_transform",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-text-static-transform.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_baseline_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.character_offset",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-character-offset.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_charoffset_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.character_offset_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-character-offset-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_charoffset_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.color",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-color.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_color_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.color_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-color-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_color_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.fill_opacity",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-fill-opacity.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_fillopacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.fill_opacity_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-fill-opacity-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_fillopacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.opacity",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-opacity.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_opacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.opacity_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-opacity-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_opacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.position",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-position.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_position_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.position_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-position-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_position_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.range_offset",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-range-offset.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_selector_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_rotation_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_rotation_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation_x",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation-x.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_rotx_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation_y",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation-y.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_roty_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.scale",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-scale.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_scale_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.scale_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-scale-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_scale_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.skew",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-skew.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_skew_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_color",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-color.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokecolor_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_opacity",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-opacity.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokeopacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_width",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-width.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokewidth_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation_x_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation-x-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_rotx_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.rotation_y_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-rotation-y-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_roty_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.skew_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-skew-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_skew_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_color_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-color-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokecolor_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_opacity_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-opacity-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokeopacity_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.stroke_width_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-stroke-width-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_strokewidth_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.animator.tracking_keyframes",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-animator-tracking-value-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/text/text_animators_tracking_body.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_animators_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.source.style",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-style.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_style_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "text.source.shape_bridge",
+      "domain": "text",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-shape.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_text_style_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing text all_6x6 migration matrix; host-open and render-compare evidence remain separately totalized."
+      ]
+    },
+    {
+      "id": "comp.background_color",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-background-color.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.comment",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-comment.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.display_start_time",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-display-start-time.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.draft_3d",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-draft-3d.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.flag_profile",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-flag-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.frame_blending",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-frame-blending.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.hide_shy_layers",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-hide-shy-layers.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.label",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-label.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.metadata_profile",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-metadata-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.motion_blur",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-motion-blur.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.motion_blur_enabled",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-motion-blur-enabled.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.object_profile",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-object-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.pixel_aspect",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-pixel-aspect.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.preserve_nested_frame_rate",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-preserve-nested-frame-rate.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.preserve_nested_resolution",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-preserve-nested-resolution.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.renderer",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-renderer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.resolution_factor",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-resolution-factor.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "comp.work_area",
+      "domain": "comp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-comp-work-area.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_comp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing comp all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.aperture",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-aperture.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.blur_level",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-blur-level.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.depth_of_field",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-depth-of-field.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.focus_distance",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-focus-distance.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_aspect_ratio",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-aspect-ratio.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_diffraction_fringe",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-diffraction-fringe.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_highlight_gain",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-highlight-gain.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_highlight_saturation",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-highlight-saturation.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_highlight_threshold",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-highlight-threshold.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_rotation",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-rotation.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_roundness",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-roundness.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.iris_shape",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-iris-shape.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.layer",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.object_profile",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-object-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "camera.zoom",
+      "domain": "camera",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-camera-zoom.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_camera_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing camera all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "layer.advanced_switches",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-advanced-switches.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.auto_orient",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-auto-orient.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.comment",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-comment.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.common_switches",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-common-switches.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.label",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-label.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.mask",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-mask.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.motion_blur",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-motion-blur.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.null_flag",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-null-flag.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.object_profile",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-object-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.parent",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-parent.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.quality_blending",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-quality-blending.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.shy",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-shy.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.source_ref",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-source-ref.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.timing",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-timing.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "layer.track_matte",
+      "domain": "layer",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-layer-track-matte.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_layer_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the existing layer all_6x6 migration matrix; explicit matte remains a separate version-boundary atom."
+      ]
+    },
+    {
+      "id": "light.casts_shadows",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-casts-shadows.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.color",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-color.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.cone_angle",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-cone-angle.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.cone_feather",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-cone-feather.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.falloff_distance",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-falloff-distance.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.falloff_start",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-falloff-start.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.falloff_type",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-falloff-type.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.intensity",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-intensity.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.kind",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-kind.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.layer",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.object_profile",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-object-profile.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.shadow_darkness",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-shadow-darkness.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.shadow_diffusion",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-shadow-diffusion.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "light.source",
+      "domain": "light",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-light-source.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_light_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "project.bits_per_channel",
+      "domain": "project",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-project-bits-per-channel.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_project_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "project.display_settings",
+      "domain": "project",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-project-display-settings.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_project_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "project.linear_color",
+      "domain": "project",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-project-linear-color.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_project_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "project.preferences",
+      "domain": "project",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-project-preferences.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_project_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "transform.expression",
+      "domain": "transform",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-transform-expression.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_transform_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "transform.keyframe_ease",
+      "domain": "transform",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-transform-keyframe-ease.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_transform_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "transform.keyframes",
+      "domain": "transform",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-transform-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_transform_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "effect.layer_param",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-effect-layer-param.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_effect_params_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "effect.param.expression",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-effect-param-expression.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_effect_params_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "effect.param.vector_keyframes",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-effect-param-vector-keyframes.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_effect_params_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "effect.control.static_values",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-effect-control-static-values.json",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effectparam_adbe_angle_control_0001.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effect_adbe_checkbox_control.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effectparam_adbe_color_control_0001.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effectparam_adbe_point_control_0001.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effectparam_adbe_point3d_control_0001.bin",
+          "required": true
+        },
+        {
+          "kind": "template",
+          "path": "internal/serializer/templates/effects/effectparam_adbe_slider_control_0001.bin",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_effect_control_static_values_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Covers static values for native Angle, Checkbox, Color, Point, Point3D, and Slider effect controls across the AE2020-AE2025 writer matrix."
+      ]
+    },
+    {
+      "id": "precomp.layer",
+      "domain": "precomp",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-precomp-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_precomp_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.adjustment_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-adjustment-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.camera_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-camera-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.light_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-light-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.null_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-null-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.precomp_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-precomp-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "default.shape_layer",
+      "domain": "default",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-default-shape-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "essential.graphics_point_controller",
+      "domain": "essential",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-essential-graphics-point-controller.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_essential_graphics_controllers_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against the Essential Graphics controllers all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "essential.graphics_controller",
+      "domain": "essential",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-essential-graphics-controller.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "essential.graphics_checkbox_controller",
+      "domain": "essential",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-essential-graphics-checkbox-controller.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "essential.graphics_color_controller",
+      "domain": "essential",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-essential-graphics-color-controller.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "motion.graphics_template_name",
+      "domain": "motion",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-motion-graphics-template-name.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "null.layer",
+      "domain": "null",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-null-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_uncovered_default_mogrt_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against an existing all_6x6 migration matrix; host-open evidence remains separately totalized."
+      ]
+    },
+    {
+      "id": "effect.static.adjustment_layer",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-adjustment-layer.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_static_effects_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against registry/evidence/versioned-aep-migration/migration_matrix_static_effects_all_6x6/matrix.json; host-open evidence is tracked by the coverage ledger."
+      ]
+    },
+    {
+      "id": "effect.static.text_layer",
+      "domain": "effect",
+      "tier": "atom",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "generate",
+        "migrate"
+      ],
+      "dependencies": [
+        {
+          "kind": "recipe",
+          "path": "examples/recipes/minimal-text-effect.json",
+          "required": true
+        },
+        {
+          "kind": "evidence",
+          "path": "registry/evidence/versioned-aep-migration/migration_matrix_static_effects_all_6x6/matrix.json",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Verified against registry/evidence/versioned-aep-migration/migration_matrix_static_effects_all_6x6/matrix.json; host-open evidence is tracked by the coverage ledger."
+      ]
+    },
+    {
+      "id": "learning.public_examples_and_knowledge",
+      "domain": "learning",
+      "tier": "source_contract",
+      "status": "verified",
+      "platform": {
+        "host_required": false,
+        "os": [
+          "windows",
+          "macos",
+          "linux"
+        ]
+      },
+      "workflows": [
+        "learn",
+        "generate"
+      ],
+      "dependencies": [
+        {
+          "kind": "source",
+          "path": "docs/knowledge",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "showcase",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "examples/sdk",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "examples/projects",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "examples/authoring",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "LICENSING.md",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "README.ja.md",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "registry/README.md",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "registry/evidence/README.md",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "examples/recipes/README.md",
+          "required": true
+        },
+        {
+          "kind": "source",
+          "path": "test_data/generators/README.md",
+          "required": true
+        }
+      ],
+      "boundaries": [
+        "Owns public documentation and runnable example sources, including preserved local showcase outputs. Per-example host acceptance remains documented separately; this source contract does not certify every showcase render."
+      ]
+    }
+  ]
+}

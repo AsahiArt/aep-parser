@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "project": {
+    "target_version": "AE2020",
+    "name": "Minimal layer timing"
+  },
+  "comps": [
+    {
+      "name": "Main",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": 30,
+      "duration": 1,
+      "background_color": [0, 0, 0],
+      "layers": [
+        {
+          "type": "text",
+          "name": "Title",
+          "start_time": 0.25,
+          "in_point": 0.1,
+          "out_point": 0.9,
+          "stretch": 0.5,
+          "text": "Layer timing",
+          "transform": {
+            "position": [960, 540]
+          }
+        }
+      ]
+    }
+  ],
+  "expected_profile": {
+    "comp_count": 1,
+    "layer_count": 1,
+    "text_layer_count": 1,
+    "layers": [
+      {
+        "name": "Title",
+        "type": "text",
+        "timing": {
+          "start_time": 0.25,
+          "in_point": 0.1,
+          "out_point": 0.9,
+          "duration": 0.8,
+          "stretch": 0.5
+        }
+      }
+    ]
+  }
+}

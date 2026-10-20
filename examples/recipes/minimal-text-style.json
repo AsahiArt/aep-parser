@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "project": {
+    "target_version": "AE2020",
+    "name": "Minimal text style"
+  },
+  "comps": [
+    {
+      "name": "Main",
+      "width": 1920,
+      "height": 1080,
+      "frame_rate": 30,
+      "duration": 2,
+      "background_color": [0, 0, 0],
+      "layers": [
+        {
+          "type": "text",
+          "name": "Title",
+          "text": "Style",
+          "text_style": {
+            "run_index": 0,
+            "paragraph_index": 0,
+            "font_size": 96,
+            "fill_color": [64, 128, 255, 255],
+            "auto_leading": false,
+            "leading": 110,
+            "tracking": 120,
+            "baseline_shift": 12,
+            "horizontal_scale": 80,
+            "vertical_scale": 120,
+            "tsume": 50,
+            "caps_option": "all_caps",
+            "baseline_option": "superscript",
+            "auto_kern_type": "optical",
+            "line_join_type": "round",
+            "digit_set": "hindi",
+            "stroke_over_fill": false,
+            "no_break": true,
+            "faux_bold": true,
+            "faux_italic": true,
+            "apply_stroke": true,
+            "stroke_color": [255, 32, 64, 255],
+            "stroke_width": 8,
+            "justification": "center",
+            "first_line_indent": 12,
+            "start_indent": 24,
+            "end_indent": 6,
+            "space_before": 8,
+            "space_after": 10,
+            "auto_hyphenate": false,
+            "leading_type": "japanese",
+            "hanging_roman": true,
+            "paragraph_direction": "rtl"
+          },
+          "transform": {
+            "position": [960, 540]
+          }
+        }
+      ]
+    }
+  ],
+  "expected_profile": {
+    "comp_count": 1,
+    "layer_count": 1,
+    "text_layer_count": 1,
+    "layers": [
+      {
+        "name": "Title",
+        "type": "text"
+      }
+    ],
+    "text_styles": [
+      {
+        "layer_name": "Title",
+        "run_index": 0,
+        "paragraph_index": 0,
+        "font_size": 96,
+        "fill_color": [0.25098039215686274, 0.5019607843137255, 1, 1],
+        "auto_leading": false,
+        "leading": 110,
+        "tracking": 120,
+        "baseline_shift": 12,
+        "horizontal_scale": 80,
+        "vertical_scale": 120,
+        "tsume": 50,
+        "caps_option": "all_caps",
+        "baseline_option": "superscript",
+        "auto_kern_type": "optical",
+        "line_join_type": "round",
+        "digit_set": "hindi",
+        "stroke_over_fill": false,
+        "no_break": true,
+        "faux_bold": true,
+        "faux_italic": true,
+        "apply_stroke": true,
+        "stroke_color": [1, 0.12549019607843137, 0.25098039215686274, 1],
+        "stroke_width": 8,
+        "justification": "center",
+        "first_line_indent": 12,
+        "start_indent": 24,
+        "end_indent": 6,
+        "space_before": 8,
+        "space_after": 10,
+        "auto_hyphenate": false,
+        "leading_type": "japanese",
+        "hanging_roman": true,
+        "paragraph_direction": "rtl"
+      }
+    ]
+  }
+}

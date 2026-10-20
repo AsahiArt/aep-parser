@@ -1,0 +1,52 @@
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries / coverage
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AE auxiliary / generated test sidecars
+*.done
+test_data/generated/
+test_data/**/*.done
+test_data/**/*.done.fail/
+
+# Local scratch/cache.
+# tmp/ is disposable cache/output; tmp_debug/ is AE/render output only; _tmp_debug/ is disposable Go probes skipped by ./...
+tmp/
+tmp_debug/
+_tmp_debug/
+/image.png
+
+
+.claude
+.superpowers/
+
+flightdeck/references
+
+# Showcase: keep INDEX.md + gen.go + render.jsx tracked, ignore heavy outputs
+showcase/**/*.aep
+showcase/**/*.png
+showcase/**/*.done.fail/
+# per-run JSX sidecar inputs (the .jsx tools are tracked; their inputs are scratch)
+showcase/**/render_frames.txt
+showcase/**/verify_timing.txt
+
+# FX 样本输入（用户提供的真实工程，供 Phase 2 解析学习，重二进制不入库）
+/data/samples/
+
+# Local/private corpus learning workspace. May contain private sample-derived
+# notes, generated reports, and non-public learning artifacts.
+/learning/

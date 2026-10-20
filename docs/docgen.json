@@ -1,0 +1,78 @@
+{
+  "pkg": "../internal/aep",
+  "pkgs": ["../internal/scene", "../internal/codec"],
+  "example_pkgs": ["../internal/aep_test"],
+  "index": "docs_index.json",
+  "files": [
+    {
+      "out": "property.md",
+      "roots": ["Property", "Keyframe", "TemporalEase", "InterpType"],
+      "funcs": ["InsertKeyframe", "DeleteKeyframe", "SetDimensionsSeparated", "RemovePropertyGroup", "MovePropertyGroup", "DuplicatePropertyGroup"],
+      "head": "_includes/property.head.md",
+      "tail": "_includes/property.tail.md"
+    },
+    {
+      "out": "marker.md",
+      "roots": ["Marker"],
+      "funcs": ["AddMarker", "RemoveMarker"],
+      "head": "_includes/marker.head.md",
+      "tail": "_includes/marker.tail.md"
+    },
+    {
+      "out": "footage.md",
+      "roots": ["Footage"],
+      "head": "_includes/footage.head.md"
+    },
+    {
+      "out": "mask.md",
+      "roots": ["Mask", "MaskVertex", "MaskPathKey", "MaskPathKeyframe", "MaskMode", "MaskMotionBlurMode"],
+      "funcs": ["AddMask", "RemoveMask", "DuplicateMask", "MoveMask", "SetMaskPath", "SetMaskPathKeyframes"],
+      "head": "_includes/mask.head.md",
+      "tail": "_includes/mask.tail.md"
+    },
+    {
+      "out": "effect.md",
+      "roots": ["Effect", "ScalarKeyframe", "VectorKeyframe"],
+      "funcs": ["AddEffect", "RemoveEffect", "SupportedEffects", "SetEffectParam", "SupportedEffectParams", "AnimateEffectParam", "AnimateEffectParamVec", "SetEffectLayerParam"],
+      "head": "_includes/effect.head.md",
+      "tail": "_includes/effect.tail.md"
+    },
+    {
+      "out": "project.md",
+      "roots": ["Project", "Folder"],
+      "funcs": ["Open", "FromReader", "Reopen", "NewProject", "AddItem", "RemoveItem"],
+      "head": "_includes/project.head.md"
+    },
+    {
+      "out": "composition.md",
+      "roots": ["Composition", "Guide", "GuideOrientation", "EssentialGraphicsController", "EGControllerType"],
+      "funcs": ["NewComposition", "DuplicateComposition", "SetRenderer", "DeleteLayer", "MoveLayer", "InsertLayer", "DuplicateLayer", "NewShapeLayer", "NewCameraLayer", "NewLightLayer", "NewTextLayer", "NewSolidLayer", "NewNullLayer", "NewAdjustmentLayer", "NewPrecompLayer"],
+      "head": "_includes/composition.head.md",
+      "tail": "_includes/composition.tail.md"
+    },
+    {
+      "out": "constants.md",
+      "roots": ["LayerType", "BlendingMode", "TrackMatteType", "AutoOrientType", "LayerQuality", "MaskMode", "InterpType", "TextJustification", "BitsPerChannel"],
+      "head": "_includes/constants.head.md",
+      "tail": "_includes/constants.tail.md"
+    },
+    {
+      "out": "layer.md",
+      "roots": ["Layer", "LightKind"],
+      "funcs": ["MoveToBeginning", "MoveToEnd", "MoveAfter", "MoveBefore", "SetMaterialOption"],
+      "head": "_includes/layer.head.md"
+    },
+    {
+      "out": "text.md",
+      "roots": ["TextSource", "TextStyleRun", "TextParagraph", "TextCapsOption", "TextBaselineOption", "TextAutoKernType", "TextLineJoinType", "TextDigitSet", "TextLeadingType", "TextParagraphDirection", "TextRangeAdvanced"],
+      "funcs": ["TextEncodedByteLen", "AddTextOpacityAnimator", "AddTextPositionAnimator", "AddTextScaleAnimator", "AddTextRotationAnimator", "AddTextColorAnimator", "AddTextFillOpacityAnimator", "AddTextStrokeOpacityAnimator", "AddTextStrokeWidthAnimator", "AddTextSkewAnimator", "AddTextRotationXAnimator", "AddTextRotationYAnimator", "AddTextStrokeColorAnimator", "AddTextTrackingAnimator", "AddTextCharacterOffsetAnimator", "AddTextRangeSelector", "AddTextWigglySelector", "AddTextExpressibleSelector", "SetTextRangeAdvanced", "DefaultTextRangeAdvanced", "AnimateTextRangeOffset", "AnimateTextOpacity", "AnimateTextRotation", "AnimateTextPosition", "AnimateTextColor", "AnimateTextScale", "AnimateTextTracking", "AnimateTextCharacterOffset"],
+      "head": "_includes/text.head.md"
+    },
+    {
+      "out": "shape.md",
+      "roots": ["ShapePath", "ShapePrimitive", "ShapePrimitiveKind"],
+      "head": "_includes/shape.head.md",
+      "tail": "_includes/shape.tail.md"
+    }
+  ]
+}
